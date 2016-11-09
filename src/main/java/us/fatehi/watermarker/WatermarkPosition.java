@@ -75,7 +75,7 @@ public enum WatermarkPosition
    }
  };
 
-  private static final byte OFFSET_X = 10, OFFSET_Y = 10;
+  private static final byte OFFSET_X = 0, OFFSET_Y = 0;
 
   public abstract int getOffsetX(int srcWidth, int wmWidth);
 
