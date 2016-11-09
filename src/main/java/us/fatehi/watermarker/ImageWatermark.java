@@ -74,14 +74,15 @@ public class ImageWatermark
         .resize(watermarkImage,
                 Method.ULTRA_QUALITY,
                 Math.min(watermarkWidth, srcWidth),
-                Math.min(watermarkWidth, srcHeight));
+                Math.min(watermarkHeight, srcHeight));
+      int resizedWatermarkWidth = resizedWatermarkImage.getWidth();
+      int resizedWatermarkHeight = resizedWatermarkImage.getHeight();
+
       g.drawImage(resizedWatermarkImage,
-                  position.getOffsetX(srcWidth,
-                                      resizedWatermarkImage.getWidth()),
-                  position.getOffsetY(srcHeight,
-                                      resizedWatermarkImage.getHeight()),
-                  watermarkWidth,
-                  watermarkHeight,
+                  position.getOffsetX(srcWidth, resizedWatermarkWidth),
+                  position.getOffsetY(srcHeight, resizedWatermarkHeight),
+                  resizedWatermarkWidth,
+                  resizedWatermarkHeight,
                   null);
 
       g.dispose();
