@@ -38,11 +38,12 @@ public abstract class ImageWatermark
    * Mark the watermark on an image, and save the output file.
    */
   public BufferedImage markImage(final BufferedImage sourceImage,
-                                 final BufferedImage watermarkImage)
+                                 final BufferedImage watermarkImage,
+                                 final ImageSize finalSize)
   {
-    Objects.requireNonNull(sourceImage, "No source image provided");
-    Objects.requireNonNull(sourceImage, "No watermark image provided");
-    
+    requireNonNull(sourceImage, "No source image provided");
+    requireNonNull(sourceImage, "No watermark image provided");
+
     final int srcWidth = sourceImage.getWidth();
     final int srcHeight = sourceImage.getHeight();
     final int watermarkWidth = watermarkImage.getWidth();
@@ -73,7 +74,20 @@ public abstract class ImageWatermark
 
     g.dispose();
 
-    return image;
+    final BufferedImage resizedImage;
+    if (finalSize != null)
+    {
+      resizedImage = Scalr.resize(watermarkImage,
+                                  Method.ULTRA_QUALITY,
+                                  Math.min(1, finalSize.getWidth()),
+                                  Math.min(1, finalSize.getHeight()));
+    }
+    else
+    {
+      resizedImage = image;
+    }
+
+    return resizedImage;
   }
 
 }

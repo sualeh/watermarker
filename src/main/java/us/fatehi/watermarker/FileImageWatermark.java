@@ -46,7 +46,7 @@ public class FileImageWatermark
       final BufferedImage watermarkImage = ImageIO
         .read(watermarkImageFile.toFile());
 
-      final BufferedImage image = markImage(sourceImage, watermarkImage);
+      final BufferedImage image = markImage(sourceImage, watermarkImage, null);
 
       ImageIO.write(image, "jpg", outputImageFile.toFile());
 
