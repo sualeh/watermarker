@@ -1,2 +1,4 @@
-# watermarker
-Watermarks and resizes photos
+# Watermarker
+
+Watermarks and resizes photos.
+
