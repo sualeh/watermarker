@@ -1,3 +1,26 @@
+/*
+========================================================================
+Watermarker
+https://github.com/sualeh/watermarker
+Copyright (c) 2016, Sualeh Fatehi <sualeh@hotmail.com>.
+All rights reserved.
+------------------------------------------------------------------------
+Watermarker is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Watermarker and the accompanying materials are made available under
+the terms of the Eclipse Public License v1.0, GNU General Public License
+v3 or GNU Lesser General Public License v3.
+
+You may elect to redistribute this code under any of these licenses.
+The Eclipse Public License is available at:
+http://www.eclipse.org/legal/epl-v10.html
+The GNU General Public License v3 and the GNU Lesser General Public
+License v3 are available at:
+http://www.gnu.org/licenses/
+========================================================================
+*/
 
 package us.fatehi.watermarker;
 
@@ -21,18 +44,21 @@ public class FileImageWatermark
   private final Path sourceImageFile;
   private final Path watermarkImageFile;
   private final Path outputImageFile;
+  private final ImageSize finalImageSize;
 
   public FileImageWatermark(final Path sourceImageFile,
                             final Path watermarkImageFile,
                             final Path outputImageFile,
                             final float alpha,
-                            final WatermarkPosition position)
+                            final WatermarkPosition position,
+                            final ImageSize finalImageSize)
   {
     super(alpha, position);
     this.sourceImageFile = checkReadableFile(sourceImageFile).toAbsolutePath();
     this.watermarkImageFile = checkReadableFile(watermarkImageFile)
       .toAbsolutePath();
     this.outputImageFile = checkWritableFile(outputImageFile).toAbsolutePath();
+    this.finalImageSize = finalImageSize;
   }
 
   /**
@@ -46,7 +72,7 @@ public class FileImageWatermark
       final BufferedImage watermarkImage = ImageIO
         .read(watermarkImageFile.toFile());
 
-      final BufferedImage image = markImage(sourceImage, watermarkImage, null);
+      final BufferedImage image = markImage(sourceImage, watermarkImage, finalImageSize);
 
       ImageIO.write(image, "jpg", outputImageFile.toFile());
 
