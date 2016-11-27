@@ -22,26 +22,40 @@ http://www.gnu.org/licenses/
 ========================================================================
 */
 
-package us.fatehi.watermarker;
+package us.fatehi.test.watermarker;
 
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 
-public class Main
+import javax.imageio.ImageIO;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import us.fatehi.test.ImageUtils;
+
+public class TestImageUtils
 {
 
-  public static void main(final String[] args)
+  @Test
+  public void compareImages()
+    throws IOException
   {
-    final Path watermarkImageFile = Paths.get(args[0]);
-    final Path sourceImageDirectory = Paths.get(args[1]);
-    final Path outputImageDirectory = Paths.get(args[2]);
-    final DirectoryImageWatermark imageWatermark = new DirectoryImageWatermark(watermarkImageFile,
-                                                                               0.4f,
-                                                                               WatermarkPosition.top_left);
-    imageWatermark.markImage(sourceImageDirectory,
-                             outputImageDirectory,
-                             new ImageSize(400, 300));
+    final ClassLoader classLoader = getClass().getClassLoader();
+    final URL sourceImageUrl = classLoader
+      .getResource("transparensee_0001.jpg");
+    final BufferedImage sourceImage = ImageIO.read(sourceImageUrl);
+    final URL expectedWatermarkedImageUrl = classLoader
+      .getResource("final1.jpg");
+    final BufferedImage expectedWatermarkedImage = ImageIO
+      .read(expectedWatermarkedImageUrl);
+
+    final boolean same = ImageUtils.compare(expectedWatermarkedImage,
+                                            sourceImage);
+    Assert.assertTrue(!same);
+
   }
 
 }

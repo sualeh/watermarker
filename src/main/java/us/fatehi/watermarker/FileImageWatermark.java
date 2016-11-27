@@ -28,6 +28,7 @@ package us.fatehi.watermarker;
 import static java.util.Objects.requireNonNull;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -36,43 +37,46 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 public class FileImageWatermark
-  extends ImageWatermark
 {
 
   private static final Logger logger = Logger.getGlobal();
 
-  private final Path sourceImageFile;
-  private final Path watermarkImageFile;
-  private final Path outputImageFile;
-  private final ImageSize finalImageSize;
+  private final ImageWatermark imageWatermark;
 
-  public FileImageWatermark(final Path sourceImageFile,
-                            final Path watermarkImageFile,
-                            final Path outputImageFile,
+  public FileImageWatermark(final Path watermarkImageFile,
                             final float alpha,
-                            final WatermarkPosition position,
-                            final ImageSize finalImageSize)
+                            final WatermarkPosition position)
   {
-    super(alpha, position);
-    this.sourceImageFile = checkReadableFile(sourceImageFile).toAbsolutePath();
-    this.watermarkImageFile = checkReadableFile(watermarkImageFile)
-      .toAbsolutePath();
-    this.outputImageFile = checkWritableFile(outputImageFile).toAbsolutePath();
-    this.finalImageSize = finalImageSize;
+    checkReadableFile(watermarkImageFile.toAbsolutePath());
+    try
+    {
+      imageWatermark = new ImageWatermark(ImageIO
+        .read(watermarkImageFile.toAbsolutePath().toFile()), alpha, position);
+    }
+    catch (final IOException e)
+    {
+      throw new IllegalArgumentException("Cannot read watermark image", e);
+    }
+
   }
 
   /**
    * Mark the watermark on an image, and save the output file.
    */
-  public void markImage()
+  public void markImage(final Path sourceImageFile,
+                        final Path outputImageFile,
+                        final ImageSize finalImageSize)
   {
+    checkReadableFile(sourceImageFile).toAbsolutePath();
+    checkWritableFile(outputImageFile).toAbsolutePath();
+    requireNonNull(finalImageSize, "No final image size provided");
+
     try
     {
       final BufferedImage sourceImage = ImageIO.read(sourceImageFile.toFile());
-      final BufferedImage watermarkImage = ImageIO
-        .read(watermarkImageFile.toFile());
 
-      final BufferedImage image = markImage(sourceImage, watermarkImage, finalImageSize);
+      final BufferedImage image = imageWatermark.markImage(sourceImage,
+                                                           finalImageSize);
 
       ImageIO.write(image, "jpg", outputImageFile.toFile());
 

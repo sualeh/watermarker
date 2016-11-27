@@ -26,83 +26,66 @@ package us.fatehi.test.watermarker;
 
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import us.fatehi.test.ImageUtils;
 import us.fatehi.watermarker.ImageWatermark;
 import us.fatehi.watermarker.WatermarkPosition;
 
 public class TestFileWatermarker
 {
 
-  public boolean compareImages(final BufferedImage image1,
-                               final BufferedImage image2)
-  {
-    boolean isSame = true;
-    final Raster raster1 = image1.getData();
-    final DataBuffer buffer1 = raster1.getDataBuffer();
-    final int size1 = buffer1.getSize();
-    final Raster raster2 = image2.getData();
-    final DataBuffer buffer2 = raster2.getDataBuffer();
-    final int size2 = buffer2.getSize();
-    if (size1 == size2)
-    {
-      for (int i = 0; i < size1; i++)
-      {
-        if (buffer1.getElem(i) != buffer2.getElem(i))
-        {
-          isSame = false;
-          break;
-        }
-      }
-    }
-    else
-    {
-      System.out.println(String.format("%d %d", size1, size2));
-      isSame = false;
-    }
-    return isSame;
-  }
-
   @Test
   public void watermark()
     throws IOException
   {
-    final ClassLoader classLoader = getClass().getClassLoader();
-    final URL sourceImageUrl = classLoader
-      .getResource("transparensee_0001.jpg");
-    final BufferedImage sourceImage = ImageIO.read(sourceImageUrl);
-    final URL watermarkUrl = classLoader.getResource("watermark1.png");
-    final BufferedImage watermarkImage = ImageIO.read(watermarkUrl);
-    final URL expectedWatermarkedImageUrl = classLoader
-      .getResource("final1.jpg");
-    final BufferedImage expectedWatermarkedImage = ImageIO
-      .read(expectedWatermarkedImageUrl);
+    final BufferedImage sourceImage = loadImageFromResource("transparensee_0001.jpg");
+    final BufferedImage watermarkImage = loadImageFromResource("watermark1.png");
+    final BufferedImage expectedWatermarkedImage = loadImageFromResource("final1.jpg");
 
-    final ImageWatermark imageWatermark = new ImageWatermark(0.4f,
+    // Watermark the photo
+    final ImageWatermark imageWatermark = new ImageWatermark(watermarkImage,
+                                                             0.4f,
                                                              WatermarkPosition.top_left);
-    final BufferedImage watermarkedImage = imageWatermark
-      .markImage(sourceImage, watermarkImage, null);
+    final BufferedImage watermarkedImage = reencodeImage(imageWatermark
+      .markImage(sourceImage, null));
 
-    final boolean same = compareImages(expectedWatermarkedImage,
-                                       watermarkedImage);
+    final boolean same = ImageUtils.compare(expectedWatermarkedImage,
+                                            watermarkedImage);
     if (!same)
     {
-
       final File actualImageFile = new File("final1.jpg");
       ImageIO.write(watermarkedImage, "jpg", actualImageFile);
       System.out.println(actualImageFile.getAbsolutePath());
     }
     Assert.assertTrue(same);
 
+  }
+
+  private final BufferedImage loadImageFromResource(final String resource)
+    throws IOException
+  {
+    final ClassLoader classLoader = getClass().getClassLoader();
+    final URL imageUrl = classLoader.getResource(resource);
+    final BufferedImage image = ImageIO.read(imageUrl);
+    return image;
+  }
+
+  private BufferedImage reencodeImage(final BufferedImage image)
+    throws IOException
+  {
+    final File tempImageFile = Files.createTempFile("final", ".jpg")
+      .toAbsolutePath().toFile();
+    ImageIO.write(image, "jpg", tempImageFile);
+    return ImageIO.read(tempImageFile);
   }
 
 }

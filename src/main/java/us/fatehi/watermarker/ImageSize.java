@@ -36,13 +36,16 @@ public class ImageSize
 
   private static final long serialVersionUID = 6982734028894632551L;
 
-  private final int width;
-  private final int height;
+  public static final ImageSize SAME_AS_ORIGINAL = new ImageSize();
 
-  public ImageSize()
+  public static boolean isSameAsOriginal(final ImageSize imageSize)
   {
-    this(0, 0);
+    return imageSize == null || imageSize.equals(new ImageSize());
   }
+
+  private final int width;
+
+  private final int height;
 
   public ImageSize(final Image image)
   {
@@ -55,6 +58,11 @@ public class ImageSize
   {
     this.width = width;
     this.height = height;
+  }
+
+  private ImageSize()
+  {
+    this(0, 0);
   }
 
   @Override

@@ -40,19 +40,22 @@ public class ImageWatermark
 
   private final float alpha;
   private final WatermarkPosition position;
+  private final BufferedImage watermarkImage;
 
-  public ImageWatermark(final float alpha, final WatermarkPosition position)
+  public ImageWatermark(final BufferedImage watermarkImage,
+                        final float alpha,
+                        final WatermarkPosition position)
   {
+    this.watermarkImage = requireNonNull(watermarkImage,
+                                         "No watermark image provided");
+    this.position = requireNonNull(position, "No watermark position provided");
     this.alpha = alpha;
-    requireNonNull(position, "No watermark position provided");
-    this.position = position;
   }
 
   /**
    * Mark the watermark on an image, and save the output file.
    */
   public BufferedImage markImage(final BufferedImage sourceImage,
-                                 final BufferedImage watermarkImage,
                                  final ImageSize finalSize)
   {
     requireNonNull(sourceImage, "No source image provided");
@@ -76,8 +79,8 @@ public class ImageWatermark
               Method.ULTRA_QUALITY,
               Math.min(watermarkWidth, srcWidth),
               Math.min(watermarkHeight, srcHeight));
-    int resizedWatermarkWidth = resizedWatermarkImage.getWidth();
-    int resizedWatermarkHeight = resizedWatermarkImage.getHeight();
+    final int resizedWatermarkWidth = resizedWatermarkImage.getWidth();
+    final int resizedWatermarkHeight = resizedWatermarkImage.getHeight();
 
     g.drawImage(resizedWatermarkImage,
                 position.getOffsetX(srcWidth, resizedWatermarkWidth),
@@ -89,12 +92,12 @@ public class ImageWatermark
     g.dispose();
 
     final BufferedImage resizedImage;
-    if (finalSize != null)
+    if (!ImageSize.isSameAsOriginal(finalSize))
     {
-      resizedImage = Scalr.resize(watermarkImage,
+      resizedImage = Scalr.resize(image,
                                   Method.ULTRA_QUALITY,
-                                  Math.min(1, finalSize.getWidth()),
-                                  Math.min(1, finalSize.getHeight()));
+                                  Math.max(1, finalSize.getWidth()),
+                                  Math.max(1, finalSize.getHeight()));
     }
     else
     {
