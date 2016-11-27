@@ -31,10 +31,14 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 public class DirectoryImageWatermark
 {
+
+  private static final Logger logger = Logger.getGlobal();
 
   private final FileImageWatermark imageWatermark;
 
@@ -69,7 +73,7 @@ public class DirectoryImageWatermark
         .stream(directoryStream.spliterator(), false).filter(path -> path
           .getFileName().toString().toLowerCase().endsWith(".jpg"))
         .forEach(path -> {
-          System.out.println(path.toAbsolutePath());
+          logger.log(Level.FINE, path.toAbsolutePath().toString());
           final Path outputImageFile = outputImageDirectory
             .resolve(path.getFileName()).toAbsolutePath();
           imageWatermark.markImage(path, outputImageFile, finalImageSize);

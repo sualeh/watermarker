@@ -41,7 +41,7 @@ public class Main
                                                                                WatermarkPosition.top_left);
     imageWatermark.markImage(sourceImageDirectory,
                              outputImageDirectory,
-                             new ImageSize(400, 300));
+                             new ImageSize(800, 600));
   }
 
 }
