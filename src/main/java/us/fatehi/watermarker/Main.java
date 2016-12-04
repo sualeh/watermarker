@@ -28,14 +28,30 @@ package us.fatehi.watermarker;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.beryx.textio.TextIO;
+import org.beryx.textio.system.SystemTextTerminal;
+
 public class Main
 {
 
   public static void main(final String[] args)
   {
-    final Path watermarkImageFile = Paths.get(args[0]);
-    final Path sourceImageDirectory = Paths.get(args[1]);
-    final Path outputImageDirectory = Paths.get(args[2]);
+    final TextIO textIO = new TextIO(new SystemTextTerminal());
+
+    final String watermarkImageFileString = textIO.newStringInputReader()
+      .read("Watermark image file");
+    final Path watermarkImageFile = Paths.get(watermarkImageFileString);
+
+    final String sourceImageDirectoryString = textIO.newStringInputReader()
+      .read("Source image directory");
+    final Path sourceImageDirectory = Paths.get(sourceImageDirectoryString);
+
+    final String outputImageDirectoryString = textIO.newStringInputReader()
+      .read("Output image directory");
+    final Path outputImageDirectory = Paths.get(outputImageDirectoryString);
+
+    textIO.dispose();
+
     final DirectoryImageWatermark imageWatermark = new DirectoryImageWatermark(watermarkImageFile,
                                                                                0.4f,
                                                                                WatermarkPosition.top_left);
