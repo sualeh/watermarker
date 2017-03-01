@@ -26,6 +26,8 @@ package us.fatehi.watermarker;
 
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.util.FileUtility.checkReadableDirectory;
+import static us.fatehi.util.FileUtility.checkReadableFile;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -51,6 +53,31 @@ public class DirectoryImageWatermark
                                             alpha,
                                             position);
 
+  }
+
+  private Path checkOrCreateWritableDirectory(final Path directory)
+  {
+    requireNonNull(directory, "No directory provided");
+    if (Files.exists(directory))
+    {
+      if (!Files.isWritable(directory))
+      {
+        throw new IllegalArgumentException(String
+          .format("Directory is not writable, %s", directory));
+      }
+    }
+    else
+    {
+      try
+      {
+        Files.createDirectory(directory);
+      }
+      catch (final IOException e)
+      {
+        throw new IllegalArgumentException("Cannot create directory", e);
+      }
+    }
+    return directory;
   }
 
   /**
@@ -84,53 +111,6 @@ public class DirectoryImageWatermark
       throw new IllegalArgumentException("Cannot find files in directory", e);
     }
 
-  }
-
-  private Path checkOrCreateWritableDirectory(final Path directory)
-  {
-    requireNonNull(directory, "No directory provided");
-    if (Files.exists(directory))
-    {
-      if (!Files.isWritable(directory))
-      {
-        throw new IllegalArgumentException(String
-          .format("Directory is not writable, %s", directory));
-      }
-    }
-    else
-    {
-      try
-      {
-        Files.createDirectory(directory);
-      }
-      catch (final IOException e)
-      {
-        throw new IllegalArgumentException("Cannot create directory", e);
-      }
-    }
-    return directory;
-  }
-
-  private Path checkReadableDirectory(final Path directory)
-  {
-    requireNonNull(directory, "No directory provided");
-    if (!(Files.isReadable(directory) && Files.isDirectory(directory)))
-    {
-      throw new IllegalArgumentException(String
-        .format("Directory is not readable, %s", directory));
-    }
-    return directory;
-  }
-
-  private Path checkReadableFile(final Path imageFile)
-  {
-    requireNonNull(imageFile, "No image file provided");
-    if (!(Files.isReadable(imageFile) && Files.isRegularFile(imageFile)))
-    {
-      throw new IllegalArgumentException(String
-        .format("File is not readable, %s", imageFile));
-    }
-    return imageFile;
   }
 
 }

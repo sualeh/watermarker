@@ -47,6 +47,11 @@ public class ImageSize
 
   private final int height;
 
+  private ImageSize()
+  {
+    this(0, 0);
+  }
+
   public ImageSize(final Image image)
   {
     requireNonNull(image, "No image provided");
@@ -58,11 +63,6 @@ public class ImageSize
   {
     this.width = width;
     this.height = height;
-  }
-
-  private ImageSize()
-  {
-    this(0, 0);
   }
 
   @Override

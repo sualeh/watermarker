@@ -24,8 +24,15 @@ http://www.gnu.org/licenses/
 package us.fatehi.templateprocessor;
 
 
+import static java.util.Objects.requireNonNull;
+
+import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -34,16 +41,49 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.thymeleaf.util.StringUtils;
 
+import us.fatehi.util.FileUtility;
+
 public class TemplateProcessor
 {
-  public void process(final String template,
-                      final Writer writer,
-                      final Path directory)
+
+  private final class ImageFileFilter
+    implements DirectoryStream.Filter<Path>
+  {
+    private final PathMatcher matcher = FileSystems.getDefault()
+      .getPathMatcher("glob:**/*.jpg");
+
+    @Override
+    public boolean accept(final Path filename)
+      throws IOException
+    {
+      return matcher.matches(filename);
+    }
+  }
+
+  private final String template;
+
+  public TemplateProcessor(final String template)
+  {
+    this.template = requireNonNull(template, "No template provided");
+  }
+
+  private Iterable<Path> iterableFiles(final Path directory)
+    throws Exception
+  {
+    return Files.newDirectoryStream(directory, new ImageFileFilter());
+  }
+
+  public void process(final Path directory, final Writer writer)
     throws Exception
   {
     if (StringUtils.isEmpty(template))
     {
       throw new Exception("No template provided");
+    }
+    FileUtility.checkReadableDirectory(directory);
+    if (writer == null)
+    {
+      throw new Exception("No output writer provided");
     }
 
     final TemplateEngine engine = new TemplateEngine();
@@ -59,7 +99,7 @@ public class TemplateProcessor
     engine.setTemplateResolver(resolver);
 
     final Context context = new Context();
-    context.setVariable("directory", directory);
+    context.setVariable("directory", iterableFiles(directory));
     engine.process(template, context, writer);
   }
 

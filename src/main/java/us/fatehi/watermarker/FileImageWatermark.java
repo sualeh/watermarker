@@ -26,10 +26,11 @@ package us.fatehi.watermarker;
 
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.util.FileUtility.checkReadableFile;
+import static us.fatehi.util.FileUtility.checkWritableFile;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,28 +86,6 @@ public class FileImageWatermark
     {
       logger.log(Level.SEVERE, "Could not mark source, " + sourceImageFile, e);
     }
-  }
-
-  private Path checkReadableFile(final Path imageFile)
-  {
-    requireNonNull(imageFile, "No image file provided");
-    if (!(Files.isReadable(imageFile) && Files.isRegularFile(imageFile)))
-    {
-      throw new IllegalArgumentException(String
-        .format("File is not readable, %s", imageFile));
-    }
-    return imageFile;
-  }
-
-  private Path checkWritableFile(final Path imageFile)
-  {
-    requireNonNull(imageFile, "No image file provided");
-    if (Files.exists(imageFile) && !Files.isWritable(imageFile))
-    {
-      throw new IllegalArgumentException(String
-        .format("File is not writable, %s", imageFile));
-    }
-    return imageFile;
   }
 
 }
