@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import javax.imageio.ImageIO;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import us.fatehi.test.ImageUtils;
@@ -43,6 +44,7 @@ import us.fatehi.watermarker.WatermarkPosition;
 public class TestFileWatermarker
 {
 
+  @Ignore
   @Test
   public void watermark()
     throws IOException
