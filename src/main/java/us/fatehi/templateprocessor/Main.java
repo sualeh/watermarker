@@ -42,21 +42,26 @@ public class Main
     final TextIO textIO = new TextIO(new SystemTextTerminal());
 
     final String sourceImageDirectoryString = textIO.newStringInputReader()
-      .read("Source image directory");
+      .read("Source directory");
     final Path sourceImageDirectory = Paths.get(sourceImageDirectoryString);
+
+    final String globString = textIO.newStringInputReader()
+      .read("Glob pattern");
+    final String glob = globString;
 
     final String templateString = textIO.newStringInputReader()
       .read("Thymeleaf template");
     final String template = templateString;
 
     final String outputFileString = textIO.newStringInputReader()
-      .read("HTML output file");
+      .read("Output file");
     final Path outputFile = Paths.get(outputFileString);
 
     textIO.dispose();
 
     final TemplateProcessor templateProcessor = new TemplateProcessor(template);
     templateProcessor.process(sourceImageDirectory,
+                              glob,
                               new FileWriter(outputFile.toFile()));
   }
 

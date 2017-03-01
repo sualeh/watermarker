@@ -26,13 +26,9 @@ package us.fatehi.templateprocessor;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -46,20 +42,6 @@ import us.fatehi.util.FileUtility;
 public class TemplateProcessor
 {
 
-  private final class ImageFileFilter
-    implements DirectoryStream.Filter<Path>
-  {
-    private final PathMatcher matcher = FileSystems.getDefault()
-      .getPathMatcher("glob:**/*.jpg");
-
-    @Override
-    public boolean accept(final Path filename)
-      throws IOException
-    {
-      return matcher.matches(filename);
-    }
-  }
-
   private final String template;
 
   public TemplateProcessor(final String template)
@@ -67,13 +49,15 @@ public class TemplateProcessor
     this.template = requireNonNull(template, "No template provided");
   }
 
-  private Iterable<Path> iterableFiles(final Path directory)
+  private Iterable<Path> iterableFiles(final Path directory, final String glob)
     throws Exception
   {
-    return Files.newDirectoryStream(directory, new ImageFileFilter());
+    return Files.newDirectoryStream(directory, new FileFilter(glob));
   }
 
-  public void process(final Path directory, final Writer writer)
+  public void process(final Path directory,
+                      final String glob,
+                      final Writer writer)
     throws Exception
   {
     if (StringUtils.isEmpty(template))
@@ -99,7 +83,7 @@ public class TemplateProcessor
     engine.setTemplateResolver(resolver);
 
     final Context context = new Context();
-    context.setVariable("directory", iterableFiles(directory));
+    context.setVariable("directory", iterableFiles(directory, glob));
     engine.process(template, context, writer);
   }
 
